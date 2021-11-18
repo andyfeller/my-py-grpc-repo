@@ -1,0 +1,23 @@
+import logging
+import random
+import string
+import sys
+
+import grpc
+from config import Config
+from messages import example_pb2 as example_messages
+from messages import example_pb2_grpc as example_service
+
+# Logging Settings
+logging.basicConfig(stream=sys.stdout,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    level=Config.LOGLEVEL,
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger()
+
+
+class ExampleService(example_service.ExampleServiceServicer):
+    def create(self, request, context):
+        logger.info("Received request: %s", request)
+
+        return example_messages.HelloReply(message="Hello, {}".format(request.name))

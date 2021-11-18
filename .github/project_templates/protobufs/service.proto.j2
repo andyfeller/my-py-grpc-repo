@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package {{ GRPC_PACKAGE_NAME}};
+
+service {{{ GRPC_SERVICE_NAME }}} {
+  rpc create({{ GRPC_SERVICE_NAME }}Request) returns ({{ GRPC_SERVICE_NAME }}Reply) {};
+  rpc update({{ GRPC_SERVICE_NAME }}Request) returns ({{ GRPC_SERVICE_NAME }}Reply) {};
+  rpc delete({{ GRPC_SERVICE_NAME }}Request) returns ({{ GRPC_SERVICE_NAME }}Reply) {};
+  rpc get({{ GRPC_SERVICE_NAME }}Request) returns ({{ GRPC_SERVICE_NAME }}Reply) {};
+  rpc list({{ GRPC_SERVICE_NAME }}Request) returns ({{ GRPC_SERVICE_NAME }}Reply) {};
+}
+
+message {{GRPC_SERVICE_NAME }}Request {
+  string name = 1;
+}
+
+message {{GRPC_SERVICE_NAME }}Reply {
+  string message = 1;
+}

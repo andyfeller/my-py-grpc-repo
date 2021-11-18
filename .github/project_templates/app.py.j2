@@ -1,0 +1,46 @@
+import logging
+import sys
+from concurrent import futures
+
+import grpc
+from grpc_reflection.v1alpha import reflection
+
+import messages.example_pb2 as example_messages
+import messages.example_pb2_grpc as example_service
+from config import Config
+from interceptors.request_header import RequestHeaderInterceptor
+from service.example import ExampleService
+
+# Logging Settings
+logging.basicConfig(stream=sys.stdout,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    level=Config.LOGLEVEL,
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger()
+
+
+def grpc_server():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),
+                         interceptors=(RequestHeaderInterceptor(),))
+
+    # Register service
+    example_service.add_ExampleServiceServicer_to_server(
+        ExampleService(), server)
+
+    # Enable Reflection
+    SERVICE_NAMES = (
+        example_messages.DESCRIPTOR.services_by_name['ExampleService'].full_name,
+        reflection.SERVICE_NAME
+    )
+    reflection.enable_server_reflection(SERVICE_NAMES, server)
+
+    logging.info(
+        f"Service Running on port: {Config.SERVICE_PORT}")
+    # This is just for testing only ( Not recommended in production )
+    server.add_insecure_port(f"[::]:{Config.SERVICE_PORT}")
+    server.start()
+    server.wait_for_termination()
+
+
+if __name__ == '__main__':
+    grpc_server()
